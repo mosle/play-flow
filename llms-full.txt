@@ -1,0 +1,890 @@
+# PlayFlow - Comprehensive Documentation
+
+PlayFlow is a powerful browser automation and video recording tool that executes predefined web workflows and captures them as MP4 videos with chapter markers, WebVTT subtitles, and detailed timing logs. It's built with TypeScript, Playwright for browser automation, and FFmpeg for video recording.
+
+## Table of Contents
+
+1. [Overview](#overview)
+2. [Installation & Setup](#installation--setup)
+3. [Project Structure](#project-structure)
+4. [Writing Workflows](#writing-workflows)
+5. [Action Reference](#action-reference)
+6. [Configuration](#configuration)
+7. [CLI Commands](#cli-commands)
+8. [Advanced Features](#advanced-features)
+9. [Examples](#examples)
+10. [Technical Details](#technical-details)
+
+## Overview
+
+PlayFlow automates web browser interactions while recording the entire process as a video and generating detailed timecode logs. It's perfect for:
+- Creating demonstration videos of web applications
+- Documenting user workflows and processes
+- Automated testing with visual proof
+- Training material generation
+- Bug reproduction videos
+- UI/UX documentation
+
+Key features:
+- JSON-based workflow definitions
+- 14 different action types for comprehensive browser control
+- Video recording with automatic MP4 conversion and chapter markers
+- QuickTime-compatible chapter navigation
+- WebVTT subtitle generation for action descriptions
+- Detailed timecode logs with action timestamps and durations
+- Configurable browser settings (headless, viewport, etc.)
+- Per-workflow configuration overrides
+- TypeScript for type safety
+- Extensible action system
+- Manual intervention support for non-automatable scenarios
+
+## Installation & Setup
+
+```bash
+# Clone the repository
+git clone <repository-url>
+cd PlayFlow
+
+# Install dependencies
+yarn install
+
+# Run initial setup
+yarn setup
+
+# Build the project
+yarn build
+```
+
+## Project Structure
+
+```
+PlayFlow/
+├── src/
+│   ├── browser/          # Browser automation logic
+│   │   ├── actions/      # Individual action implementations
+│   │   ├── action-executor.ts
+│   │   ├── action-handler-registry.ts
+│   │   └── browser-controller.ts
+│   ├── cli/              # Command-line interface
+│   │   ├── commands/     # CLI command implementations
+│   │   └── index.ts
+│   ├── core/             # Core business logic
+│   │   ├── config-manager.ts
+│   │   ├── file-system-manager.ts
+│   │   └── workflow-manager.ts
+│   ├── types/            # TypeScript type definitions
+│   │   ├── action.ts
+│   │   ├── config.ts
+│   │   ├── workflow.ts
+│   │   └── index.ts
+│   ├── utils/            # Utility functions
+│   │   ├── errors.ts
+│   │   ├── validation.ts
+│   │   └── video-converter.ts
+│   └── video/            # Video recording logic
+│       └── video-recorder.ts
+├── workflows/            # Workflow definitions
+│   └── <workflow-name>/
+│       ├── actions.json  # Required: Action sequence
+│       └── config.json   # Optional: Workflow config
+├── output/               # Generated output organized by workflow run
+│   └── <workflow>_<timestamp>/
+│       ├── video.mp4     # Video with embedded chapters
+│       ├── timecode.txt  # Detailed timing log
+│       ├── screenshots/  # Individual screenshots
+│       ├── markers.vtt   # WebVTT subtitles
+│       └── chapters.txt  # FFMETADATA chapter data
+├── tests/                # Test suites
+└── recording-config.json # Global configuration
+
+```
+
+## Writing Workflows
+
+### Basic Structure
+
+Each workflow is a folder in the `workflows/` directory containing:
+
+1. **actions.json** (required): Array of actions to perform
+2. **config.json** (optional): Workflow-specific configuration
+
+### Creating a New Workflow
+
+1. Create a new folder in `workflows/`:
+   ```bash
+   mkdir workflows/my-workflow
+   ```
+
+2. Create `actions.json`:
+   ```json
+   [
+     {
+       "type": "goto",
+       "url": "https://example.com",
+       "description": "Navigate to Example.com"
+     },
+     {
+       "type": "waitForSelector",
+       "selector": "h1",
+       "description": "Wait for page to load"
+     },
+     {
+       "type": "screenshot",
+       "filename": "homepage",
+       "description": "Capture homepage",
+       "skipVtt": false,
+       "skipChapter": false
+     }
+   ]
+   ```
+
+3. Optionally create `config.json` for workflow-specific settings:
+   ```json
+   {
+     "browser": {
+       "headless": false,
+       "slowMo": 500
+     },
+     "video": {
+       "width": 1280,
+       "height": 720
+     }
+   }
+   ```
+
+## Action Reference
+
+### Action Options
+
+All actions support these optional parameters:
+
+| Option | Type | Description |
+|--------|------|-------------|
+| `description` | string | Human-readable description shown in logs and video markers |
+| `skipVtt` | boolean | Skip this action in WebVTT subtitle generation |
+| `skipChapter` | boolean | Skip this action in video chapter markers |
+
+### Navigation Actions
+
+#### goto
+Navigate to a URL.
+```json
+{
+  "type": "goto",
+  "url": "https://example.com",
+  "description": "Navigate to website",
+  "options": {
+    "waitUntil": "networkidle"  // Optional: load, domcontentloaded, networkidle
+  }
+}
+```
+
+### Interaction Actions
+
+#### click
+Click an element.
+```json
+{
+  "type": "click",
+  "selector": "button#submit",
+  "description": "Click submit button",
+  "options": {
+    "button": "left",     // Optional: left, right, middle
+    "clickCount": 1,      // Optional: number of clicks
+    "delay": 0           // Optional: delay between mousedown and mouseup
+  }
+}
+```
+
+#### fill
+Fill an input field (clears existing content first).
+```json
+{
+  "type": "fill",
+  "selector": "input[name='email']",
+  "value": "user@example.com",
+  "description": "Enter email address"
+}
+```
+
+#### type
+Type text character by character (doesn't clear existing content).
+```json
+{
+  "type": "type",
+  "selector": "textarea#comment",
+  "text": "This is a comment",
+  "description": "Type comment",
+  "options": {
+    "delay": 100  // Optional: delay between keystrokes in ms
+  }
+}
+```
+
+#### press
+Press a keyboard key.
+```json
+{
+  "type": "press",
+  "key": "Enter",
+  "description": "Press Enter key",
+  "selector": "input#search"  // Optional: focus element first
+}
+```
+
+Common keys: Enter, Tab, Space, Escape, ArrowUp, ArrowDown, ArrowLeft, ArrowRight, Backspace, Delete
+
+#### hover
+Hover over an element.
+```json
+{
+  "type": "hover",
+  "selector": "div.tooltip-trigger",
+  "description": "Hover to show tooltip"
+}
+```
+
+### Form Actions
+
+#### check
+Check a checkbox.
+```json
+{
+  "type": "check",
+  "selector": "input#agree-terms",
+  "description": "Check terms agreement"
+}
+```
+
+#### uncheck
+Uncheck a checkbox.
+```json
+{
+  "type": "uncheck",
+  "selector": "input#newsletter",
+  "description": "Uncheck newsletter subscription"
+}
+```
+
+#### selectOption
+Select option(s) from a dropdown.
+```json
+{
+  "type": "selectOption",
+  "selector": "select#country",
+  "values": ["US"],  // Can be array for multi-select
+  "description": "Select country"
+}
+```
+
+### Wait Actions
+
+#### waitForSelector
+Wait for an element to appear.
+```json
+{
+  "type": "waitForSelector",
+  "selector": "div.loading",
+  "description": "Wait for content to load",
+  "options": {
+    "state": "visible",     // Optional: visible, hidden, attached, detached
+    "timeout": 30000       // Optional: timeout in ms
+  }
+}
+```
+
+#### waitForTimeout
+Wait for a fixed duration.
+```json
+{
+  "type": "waitForTimeout",
+  "timeout": 2000,
+  "description": "Wait 2 seconds",
+  "skipVtt": true,      // Often skipped to reduce subtitle clutter
+  "skipChapter": true   // Often skipped for minor waits
+}
+```
+
+#### waitForManualAction
+Pause automation for manual intervention (login, CAPTCHA, etc.).
+```json
+{
+  "type": "waitForManualAction",
+  "message": "Please complete the Google login process",
+  "continueSelector": "#user-menu",  // Option 1: Wait for element
+  "continueText": "Welcome",          // Option 2: Wait for text
+  "timeout": 300000,
+  "description": "Manual login required"
+}
+```
+
+For manual trigger, create `.continue` file in project root:
+```bash
+touch .continue
+```
+
+### Utility Actions
+
+#### screenshot
+Capture a screenshot.
+```json
+{
+  "type": "screenshot",
+  "filename": "checkout-page",  // Optional: custom filename
+  "description": "Capture checkout page",
+  "options": {
+    "fullPage": true  // Optional: capture full scrollable page
+  }
+}
+```
+
+#### evaluate
+Execute JavaScript in the page context.
+```json
+{
+  "type": "evaluate",
+  "script": "document.querySelector('h1').textContent",
+  "description": "Get page title"
+}
+```
+
+## Configuration
+
+### Global Configuration (recording-config.json)
+
+```json
+{
+  "outputDir": "./output",
+  "browser": {
+    "headless": true,
+    "slowMo": 0,
+    "viewport": {
+      "width": 1920,
+      "height": 1080
+    },
+    "defaultTimeout": 30000,      // Default timeout for all actions (ms)
+    "navigationTimeout": 30000    // Timeout for navigation actions (ms)
+  },
+  "video": {
+    "width": 1920,
+    "height": 1080,
+    "fps": 30,
+    "skipAllVtt": false,      // Global WebVTT subtitle control
+    "skipAllChapters": false  // Global chapter marker control
+  }
+}
+```
+
+### Configuration Options
+
+**outputDir**: Where to save videos and screenshots
+
+**browser options:**
+- `headless`: Run browser in headless mode (no UI)
+- `slowMo`: Slow down operations by specified ms
+- `viewport`: Browser viewport dimensions
+- `defaultTimeout`: Default timeout for all actions in milliseconds (default: 30000)
+- `navigationTimeout`: Timeout for navigation actions like goto (default: 30000)
+
+**video options:**
+- `width/height`: Video resolution
+- `fps`: Frames per second (affects file size and smoothness)
+- `skipAllVtt`: Disable WebVTT subtitle generation globally
+- `skipAllChapters`: Disable chapter marker generation globally
+
+### Per-Workflow Configuration
+
+Override global settings for specific workflows by creating `config.json` in the workflow folder. Only include the settings you want to override.
+
+## CLI Commands
+
+### Setup
+```bash
+yarn setup
+```
+Initialize the project, create necessary directories.
+
+### Record
+```bash
+yarn record <workflow-name> [options]
+```
+Execute and record a workflow. The video will be saved to the output directory.
+
+Options:
+- `--session <name>`: Load a saved browser session
+- `--save-session <name>`: Save the browser session after recording
+- `--dry-run`: Validate workflow without executing
+
+### Execute
+```bash
+yarn execute <workflow-name> [options]
+```
+Execute a workflow without recording video. Perfect for login workflows and environment setup.
+
+Options:
+- `--save-session <name>`: Save browser session after execution
+- `--session <name>`: Load a saved browser session
+
+Use cases:
+- Login workflows that save authentication state
+- Setup workflows that prepare the environment
+- Any workflow where video recording is not needed
+
+### List
+```bash
+yarn list
+```
+Display all available workflows.
+
+### Validate
+```bash
+yarn validate <workflow-name>
+```
+Validate workflow syntax without executing it. Useful for checking JSON syntax and required fields.
+
+### Development Commands
+```bash
+yarn build        # Build TypeScript
+yarn dev          # Watch mode
+yarn test         # Run all tests
+yarn lint         # Run ESLint
+yarn typecheck    # TypeScript type checking
+```
+
+## Session Management
+
+PlayFlow supports saving and loading browser sessions to avoid repetitive login processes.
+
+### Example: Google Login Session
+
+1. Create a login workflow (`workflows/google-login/actions.json`):
+```json
+[
+  {
+    "type": "goto",
+    "url": "https://accounts.google.com",
+    "description": "Navigate to Google login"
+  },
+  {
+    "type": "waitForManualAction",
+    "message": "Please complete the login process",
+    "continueSelector": "img[aria-label*='Google Account']",
+    "description": "Wait for manual login"
+  }
+]
+```
+
+2. Execute the login workflow and save session:
+```bash
+yarn execute google-login --save-session google-account
+```
+
+3. Use the saved session in other workflows:
+```bash
+yarn record my-gmail-workflow --session google-account
+```
+
+### Session Storage
+
+Sessions are stored in the `sessions/` directory and include:
+- Cookies
+- Local storage
+- Session storage
+- Authentication tokens
+- IndexedDB data
+
+Sessions are browser-specific and include all persistent state needed to maintain login status.
+
+## Advanced Features
+
+### Dynamic Values
+
+Use environment variables or dynamic data in your workflows:
+
+```json
+{
+  "type": "fill",
+  "selector": "input#username",
+  "value": "${process.env.TEST_USERNAME || 'default-user'}",
+  "description": "Enter username"
+}
+```
+
+### Complex Selectors
+
+PlayFlow supports all CSS selectors and Playwright-specific selectors:
+
+```json
+{
+  "type": "click",
+  "selector": "text=Submit",  // Text selector
+  "description": "Click submit button"
+}
+```
+
+```json
+{
+  "type": "click",
+  "selector": "//button[contains(text(), 'Submit')]",  // XPath
+  "description": "Click submit button"
+}
+```
+
+### Conditional Actions
+
+Use evaluate action to implement conditional logic:
+
+```json
+{
+  "type": "evaluate",
+  "script": "if (document.querySelector('.error')) { throw new Error('Error found'); }",
+  "description": "Check for errors"
+}
+```
+
+### Custom Action Handlers
+
+The action system is extensible. Add new actions by:
+
+1. Creating a new file in `src/browser/actions/`
+2. Implementing the `ActionHandler` interface
+3. Registering it in the action handler registry
+
+## Examples
+
+### Example 1: Login Flow
+
+```json
+[
+  {
+    "type": "goto",
+    "url": "https://app.example.com/login",
+    "description": "Navigate to login page"
+  },
+  {
+    "type": "fill",
+    "selector": "input#email",
+    "value": "user@example.com",
+    "description": "Enter email"
+  },
+  {
+    "type": "fill",
+    "selector": "input#password",
+    "value": "password123",
+    "description": "Enter password"
+  },
+  {
+    "type": "click",
+    "selector": "button[type='submit']",
+    "description": "Click login button"
+  },
+  {
+    "type": "waitForSelector",
+    "selector": ".dashboard",
+    "description": "Wait for dashboard to load"
+  },
+  {
+    "type": "screenshot",
+    "filename": "dashboard",
+    "description": "Capture dashboard"
+  }
+]
+```
+
+### Example 2: E-commerce Checkout
+
+```json
+[
+  {
+    "type": "goto",
+    "url": "https://shop.example.com",
+    "description": "Go to shop"
+  },
+  {
+    "type": "click",
+    "selector": ".product-card:first-child",
+    "description": "Click first product"
+  },
+  {
+    "type": "click",
+    "selector": "button.add-to-cart",
+    "description": "Add to cart"
+  },
+  {
+    "type": "waitForTimeout",
+    "timeout": 1000,
+    "description": "Wait for cart update"
+  },
+  {
+    "type": "click",
+    "selector": "a.view-cart",
+    "description": "View cart"
+  },
+  {
+    "type": "click",
+    "selector": "button.checkout",
+    "description": "Proceed to checkout"
+  },
+  {
+    "type": "fill",
+    "selector": "input[name='email']",
+    "value": "customer@example.com",
+    "description": "Enter email"
+  },
+  {
+    "type": "fill",
+    "selector": "input[name='card-number']",
+    "value": "4111111111111111",
+    "description": "Enter card number"
+  },
+  {
+    "type": "selectOption",
+    "selector": "select[name='exp-month']",
+    "values": ["12"],
+    "description": "Select expiry month"
+  },
+  {
+    "type": "click",
+    "selector": "button.place-order",
+    "description": "Place order"
+  },
+  {
+    "type": "waitForSelector",
+    "selector": ".order-confirmation",
+    "description": "Wait for confirmation"
+  },
+  {
+    "type": "screenshot",
+    "filename": "order-confirmation",
+    "options": { "fullPage": true },
+    "description": "Capture confirmation"
+  }
+]
+```
+
+### Example 3: Form Testing with Validation
+
+```json
+[
+  {
+    "type": "goto",
+    "url": "https://forms.example.com/contact",
+    "description": "Go to contact form"
+  },
+  {
+    "type": "click",
+    "selector": "button[type='submit']",
+    "description": "Try submitting empty form"
+  },
+  {
+    "type": "waitForSelector",
+    "selector": ".error-message",
+    "description": "Check for validation errors"
+  },
+  {
+    "type": "screenshot",
+    "filename": "validation-errors",
+    "description": "Capture validation state"
+  },
+  {
+    "type": "fill",
+    "selector": "input[name='name']",
+    "value": "John Doe",
+    "description": "Fill name field"
+  },
+  {
+    "type": "fill",
+    "selector": "input[name='email']",
+    "value": "invalid-email",
+    "description": "Enter invalid email"
+  },
+  {
+    "type": "click",
+    "selector": "button[type='submit']",
+    "description": "Submit with invalid email"
+  },
+  {
+    "type": "waitForSelector",
+    "selector": ".email-error",
+    "description": "Check email validation"
+  },
+  {
+    "type": "fill",
+    "selector": "input[name='email']",
+    "value": "john@example.com",
+    "description": "Fix email"
+  },
+  {
+    "type": "type",
+    "selector": "textarea[name='message']",
+    "text": "This is a test message for the contact form.",
+    "description": "Type message"
+  },
+  {
+    "type": "check",
+    "selector": "input#agree-terms",
+    "description": "Agree to terms"
+  },
+  {
+    "type": "click",
+    "selector": "button[type='submit']",
+    "description": "Submit valid form"
+  },
+  {
+    "type": "waitForSelector",
+    "selector": ".success-message",
+    "description": "Wait for success"
+  }
+]
+```
+
+## Technical Details
+
+### Architecture
+
+1. **Action Executor Pattern**: Each action type has a dedicated handler implementing the `ActionHandler` interface.
+
+2. **Configuration Hierarchy**: Global config → Workflow config → Action options
+
+3. **Video Recording Process**:
+   - Browser viewport is captured frame by frame
+   - FFmpeg processes frames into video
+   - Timecodes and descriptions are overlaid
+   - Temporary files are cleaned up after processing
+
+4. **Error Handling**:
+   - Validation errors caught before execution
+   - Runtime errors include context (action index, type)
+   - Videos saved even if workflow fails partway
+
+5. **Type Safety**:
+   - Zod schemas validate all JSON inputs
+   - TypeScript ensures type safety throughout
+   - Strict null checks and type inference
+
+### Performance Considerations
+
+- **Headless Mode**: Faster execution, lower resource usage
+- **Video Resolution**: Higher resolution = larger files
+- **Frame Rate**: 30 FPS is optimal balance
+- **Selector Performance**: ID/class selectors are fastest
+- **Wait Strategies**: Use specific waits over timeouts
+
+### Troubleshooting
+
+**Browser won't start:**
+- Check Playwright installation: `npx playwright install`
+- Verify system requirements
+
+**Video recording fails:**
+- Ensure FFmpeg is installed: `ffmpeg -version`
+- Check disk space for temporary files
+- Verify output directory permissions
+
+**Selectors not found:**
+- Use browser DevTools to verify selectors
+- Add appropriate wait actions
+- Check if elements are in iframes
+
+**Performance issues:**
+- Reduce video resolution
+- Use headless mode
+- Lower frame rate to 15-20 FPS
+- Increase action timeouts
+
+### Best Practices
+
+1. **Descriptive Actions**: Always include clear descriptions
+2. **Proper Waits**: Use selector waits over fixed timeouts
+3. **Error Recovery**: Plan for failure scenarios
+4. **Modular Workflows**: Break complex flows into smaller workflows
+5. **Version Control**: Track workflows in git
+6. **Sensitive Data**: Never commit passwords or tokens
+7. **Validation**: Always validate before recording
+
+### Output Files
+
+When you run a workflow, PlayFlow generates an organized output directory:
+
+**Directory structure**: `output/<workflow>_<timestamp>/`
+
+1. **Video file**: `video.mp4`
+   - High-quality MP4 video of the entire workflow execution
+   - Embedded chapter markers for navigation (QuickTime compatible)
+   - Each action becomes a clickable chapter
+   - Automatically converted from WebM format
+
+2. **Timecode log**: `timecode.txt`
+   - Detailed log with timestamps for each action
+   - Shows action duration and descriptions
+   - Includes error messages if actions fail
+   - Example format:
+   ```
+   Workflow: example-workflow
+   Started at: 2025-01-18T14:30:00.000Z
+   ================================================================================
+
+   TIME		DURATION	ACTION			DESCRIPTION
+   --------------------------------------------------------------------------------
+
+   00:00.000		+0ms		goto                	Navigate to https://example.com
+   00:01.523		+1523ms		[Completed #1]
+   00:02.045		+0ms		click               	Click submit button
+   00:02.567		+522ms		[Completed #2]
+   00:03.090		+0ms		fill                	Fill #email with "user@example.com"
+   00:03.612		+522ms		[Completed #3]
+
+   --------------------------------------------------------------------------------
+   Total duration: 3s 612ms
+   Completed at: 2025-01-18T14:30:03.612Z
+   ```
+
+3. **Screenshots** (when requested): `screenshots/` directory
+   - Individual PNG files for each screenshot action
+   - Named based on the `filename` parameter or auto-generated
+
+4. **WebVTT subtitles**: `markers.vtt`
+   - Action descriptions as video subtitles
+   - Can be loaded in most video players
+   - Shows action timing and descriptions
+   - Useful for video navigation and documentation
+
+5. **Chapter metadata**: `chapters.txt`
+   - FFMETADATA format chapter definitions
+   - Used during video conversion to embed chapters
+   - Contains precise millisecond timing for each action
+
+### Video Navigation Features
+
+**Chapter Markers:**
+- Automatically embedded in MP4 files
+- Visible in QuickTime Player, VLC, and other compatible players
+- Click chapters to jump to specific actions
+- Each action becomes a navigable chapter (unless skipped)
+
+**WebVTT Subtitles:**
+- Load `markers.vtt` as subtitle track in video players
+- See action descriptions overlaid on video
+- Useful for presentations and documentation
+- Can be edited with any text editor
+
+**Controlling Navigation Features:**
+```json
+// Per-action control
+{
+  "type": "waitForTimeout",
+  "timeout": 3000,
+  "skipVtt": true,      // Skip in subtitles
+  "skipChapter": true   // Skip in chapters
+}
+
+// Global control in config
+{
+  "video": {
+    "skipAllVtt": true,      // Disable all subtitles
+    "skipAllChapters": true  // Disable all chapters
+  }
+}
+```
+
+This tool provides a powerful way to document, test, and demonstrate web applications with minimal effort while maintaining professional video quality, easy navigation, and detailed execution logs.

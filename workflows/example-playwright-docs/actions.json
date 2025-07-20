@@ -1,0 +1,43 @@
+[
+  {
+    "type": "goto",
+    "url": "https://playwright.dev",
+    "description": "Navigate to Playwright documentation"
+  },
+  {
+    "type": "waitForSelector",
+    "selector": "nav",
+    "description": "Wait for navigation menu to load"
+  },
+  {
+    "type": "click",
+    "selector": "a[href*='docs/intro']",
+    "description": "Click on Documentation link"
+  },
+  {
+    "type": "waitForSelector",
+    "selector": "article",
+    "description": "Wait for documentation content"
+  },
+  {
+    "type": "screenshot",
+    "filename": "playwright-docs",
+    "description": "Capture documentation page"
+  },
+  {
+    "type": "hover",
+    "selector": "nav button[aria-label*='Search']",
+    "description": "Hover over search button"
+  },
+  {
+    "type": "waitForTimeout",
+    "timeout": 1000,
+    "description": "Wait to see hover effect"
+  },
+  {
+    "type": "screenshot",
+    "filename": "playwright-hover",
+    "fullPage": false,
+    "description": "Capture hover state"
+  }
+]

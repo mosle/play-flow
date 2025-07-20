@@ -1,0 +1,44 @@
+[
+  {
+    "type": "goto",
+    "url": "https://example.com",
+    "description": "Navigate to Example.com"
+  },
+  {
+    "type": "waitForSelector",
+    "selector": "h1",
+    "description": "Wait for main header to appear"
+  },
+  {
+    "type": "screenshot",
+    "filename": "example-original",
+    "description": "Take screenshot of original page"
+  },
+  {
+    "type": "evaluate",
+    "script": "document.querySelector('h1').textContent = 'Modified Example Domain'; document.querySelector('h1').style.color = 'red'; document.querySelector('p').innerHTML = 'This text has been <strong>modified</strong> by JavaScript!';",
+    "description": "Modify page content with JavaScript"
+  },
+  {
+    "type": "waitForTimeout",
+    "timeout": 2000,
+    "description": "Wait to see the changes",
+    "skipVtt": true,
+    "skipChapter": true
+  },
+  {
+    "type": "hover",
+    "selector": "a",
+    "description": "Hover over the link"
+  },
+  {
+    "type": "waitForTimeout",
+    "timeout": 1000,
+    "description": "Wait to see hover effect"
+  },
+  {
+    "type": "screenshot",
+    "filename": "example-modified",
+    "description": "Take screenshot after modifications"
+  }
+]

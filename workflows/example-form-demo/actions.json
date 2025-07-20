@@ -1,0 +1,52 @@
+[
+  {
+    "type": "goto",
+    "url": "https://www.w3schools.com/html/html_forms.asp",
+    "description": "Navigate to W3Schools form demo"
+  },
+  {
+    "type": "waitForSelector",
+    "selector": "#main",
+    "description": "Wait for main content"
+  },
+  {
+    "type": "click",
+    "selector": "a.w3-btn[href='tryit.asp?filename=tryhtml_form_submit']",
+    "description": "Click Try it Yourself button"
+  },
+  {
+    "type": "waitForTimeout",
+    "timeout": 2000,
+    "description": "Wait for editor to load"
+  },
+  {
+    "type": "click",
+    "selector": "#runbtn",
+    "description": "Run the code"
+  },
+  {
+    "type": "waitForSelector",
+    "selector": "#iframeResult",
+    "description": "Wait for result iframe"
+  },
+  {
+    "type": "screenshot",
+    "filename": "form-demo-editor",
+    "description": "Capture the form editor"
+  },
+  {
+    "type": "evaluate",
+    "script": "document.querySelector('#iframeResult').scrollIntoView()",
+    "description": "Scroll to result iframe"
+  },
+  {
+    "type": "waitForTimeout",
+    "timeout": 1000,
+    "description": "Wait for scroll animation"
+  },
+  {
+    "type": "screenshot",
+    "filename": "form-demo-result",
+    "description": "Capture the form result"
+  }
+]

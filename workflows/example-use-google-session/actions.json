@@ -1,0 +1,32 @@
+[
+  {
+    "type": "goto",
+    "url": "https://mail.google.com",
+    "description": "Navigate to Gmail (should be already logged in)"
+  },
+  {
+    "type": "waitForSelector",
+    "selector": "[aria-label*='Gmail']",
+    "description": "Wait for Gmail to load"
+  },
+  {
+    "type": "screenshot",
+    "filename": "gmail-inbox",
+    "description": "Capture Gmail inbox"
+  },
+  {
+    "type": "goto",
+    "url": "https://drive.google.com",
+    "description": "Navigate to Google Drive"
+  },
+  {
+    "type": "waitForSelector",
+    "selector": "[aria-label*='Google Drive']",
+    "description": "Wait for Drive to load"
+  },
+  {
+    "type": "screenshot",
+    "filename": "google-drive",
+    "description": "Capture Google Drive"
+  }
+]

@@ -1,0 +1,43 @@
+[
+  {
+    "type": "goto", 
+    "url": "https://developer.mozilla.org",
+    "description": "Navigate to MDN Web Docs"
+  },
+  {
+    "type": "waitForSelector",
+    "selector": ".main-wrapper",
+    "description": "Wait for main content"
+  },
+  {
+    "type": "screenshot",
+    "filename": "mdn-home",
+    "description": "Capture MDN homepage"
+  },
+  {
+    "type": "click",
+    "selector": "a[href='/en-US/docs/Web/JavaScript']",
+    "description": "Click on JavaScript guide"
+  },
+  {
+    "type": "waitForSelector",
+    "selector": ".sidebar",
+    "description": "Wait for sidebar navigation"
+  },
+  {
+    "type": "evaluate",
+    "script": "document.querySelector('.sidebar-toggle')?.click()",
+    "description": "Toggle sidebar if on mobile"
+  },
+  {
+    "type": "waitForTimeout",
+    "timeout": 1000,
+    "description": "Wait for animation"
+  },
+  {
+    "type": "screenshot",
+    "filename": "mdn-javascript",
+    "fullPage": false,
+    "description": "Capture JavaScript documentation"
+  }
+]

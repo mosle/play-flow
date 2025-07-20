@@ -1,0 +1,57 @@
+{
+  "name": "play-flow",
+  "version": "1.0.0",
+  "description": "Web browser automation and video recording CLI tool using Playwright",
+  "main": "dist/cli/index.js",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "setup": "ts-node src/cli/index.ts setup",
+    "record": "ts-node src/cli/index.ts record",
+    "execute": "ts-node src/cli/index.ts execute",
+    "list": "ts-node src/cli/index.ts list",
+    "validate": "ts-node src/cli/index.ts validate",
+    "test": "vitest",
+    "test:unit": "vitest tests/unit",
+    "test:integration": "vitest tests/integration",
+    "test:e2e": "vitest tests/e2e",
+    "test:watch": "vitest --watch",
+    "lint": "eslint src --ext .ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "keywords": [
+    "playwright",
+    "automation",
+    "video-recording",
+    "browser",
+    "typescript"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@ffmpeg-installer/ffmpeg": "^1.1.0",
+    "@playwright/test": "^1.54.1",
+    "chalk": "^5.4.1",
+    "commander": "^14.0.0",
+    "fluent-ffmpeg": "^2.1.3",
+    "playwright": "^1.54.1",
+    "zod": "^3.25.76"
+  },
+  "devDependencies": {
+    "@types/fluent-ffmpeg": "^2.1.27",
+    "@types/mock-fs": "^4.13.4",
+    "@types/node": "^20.19.8",
+    "@typescript-eslint/eslint-plugin": "^8.37.0",
+    "@typescript-eslint/parser": "^8.37.0",
+    "@vitest/ui": "^3.2.4",
+    "eslint": "^9.31.0",
+    "mock-fs": "^5.5.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.8.3",
+    "vitest": "^1.6.1"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "packageManager": "yarn@4.9.2"
+}

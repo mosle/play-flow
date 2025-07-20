@@ -1,0 +1,9 @@
+{
+  "browser": {
+    "headless": false,
+    "slowMo": 100
+  },
+  "video": {
+    "fps": 30
+  }
+}

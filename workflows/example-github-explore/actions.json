@@ -1,0 +1,42 @@
+[
+  {
+    "type": "goto",
+    "url": "https://github.com/explore",
+    "description": "Navigate to GitHub Explore"
+  },
+  {
+    "type": "waitForSelector",
+    "selector": "main",
+    "description": "Wait for main content to load"
+  },
+  {
+    "type": "screenshot",
+    "filename": "github-explore-home",
+    "description": "Capture explore page"
+  },
+  {
+    "type": "click",
+    "selector": "a[href='/topics']",
+    "description": "Click on Topics"
+  },
+  {
+    "type": "waitForSelector",
+    "selector": ".topic-card",
+    "description": "Wait for topic cards to load"
+  },
+  {
+    "type": "hover",
+    "selector": ".topic-card:first-child",
+    "description": "Hover over first topic"
+  },
+  {
+    "type": "waitForTimeout",
+    "timeout": 500,
+    "description": "Brief pause to see hover effect"
+  },
+  {
+    "type": "screenshot",
+    "filename": "github-topics",
+    "description": "Capture topics page"
+  }
+]

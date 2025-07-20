@@ -1,0 +1,19 @@
+[
+  {
+    "type": "goto",
+    "url": "https://accounts.google.com",
+    "description": "Navigate to Google login page"
+  },
+  {
+    "type": "waitForManualAction",
+    "message": "Please complete the Google login process. The workflow will continue when you see your Google account profile.",
+    "continueSelector": "img[aria-label*='Google Account']",
+    "timeout": 300000,
+    "description": "Wait for manual login completion"
+  },
+  {
+    "type": "screenshot",
+    "filename": "logged-in",
+    "description": "Capture logged-in state"
+  }
+]

@@ -1,0 +1,103 @@
+# PlayFlow
+
+A browser automation and video recording tool that executes web workflows and captures them as MP4 videos with chapter markers, subtitles, and detailed timing logs.
+
+## Quick Start
+
+```bash
+# Setup
+yarn install
+yarn setup
+
+# Record a workflow
+yarn record <workflow-name>
+
+# Execute without recording (for login/setup)
+yarn execute <workflow-name>
+
+# List available workflows
+yarn list
+```
+
+## Writing Workflows
+
+Create a folder in `workflows/` with `actions.json`:
+
+```json
+[
+  {
+    "type": "goto",
+    "url": "https://example.com",
+    "description": "Navigate to website"
+  },
+  {
+    "type": "click",
+    "selector": "button#submit",
+    "description": "Click submit button"
+  },
+  {
+    "type": "fill",
+    "selector": "input[name='email']",
+    "value": "user@example.com",
+    "description": "Enter email"
+  }
+]
+```
+
+## Available Actions
+
+- **Navigation**: `goto`
+- **Click/Input**: `click`, `fill`, `type`, `press`, `hover`
+- **Form**: `check`, `uncheck`, `selectOption`
+- **Wait**: `waitForSelector`, `waitForTimeout`, `waitForManualAction`
+- **Other**: `screenshot`, `evaluate`
+
+## Action Properties
+
+- `type`: Action type (required)
+- `description`: Text overlay for video (optional)
+- `selector`: CSS selector for element actions
+- `url`: URL for goto action
+- `value`: Input value for fill action
+- `key`: Key name for press action
+- `timeout`: Wait duration in ms
+- `script`: JavaScript code for evaluate action
+- `message`: Instruction for manual action
+- `continueSelector`: CSS selector to wait for completion
+- `continueText`: Text to wait for completion
+- `skipVtt`: Skip WebVTT subtitle generation for this action (optional)
+- `skipChapter`: Skip chapter marker for this action (optional)
+
+## Configuration
+
+Global settings in `recording-config.json`:
+- Browser: headless, viewport size, defaultTimeout, navigationTimeout
+- Video: resolution, frame rate, skipAllVtt, skipAllChapters
+- Output directory
+
+Session management:
+- `yarn execute <workflow> --save-session <name>` - Save login state
+- `yarn record <workflow> --session <name>` - Use saved session
+
+Per-workflow config in `workflows/<name>/config.json` (optional)
+
+## Output
+
+Organized in `output/<workflow>_<timestamp>/` directory:
+
+- **video.mp4**: Recording with embedded chapter markers (QuickTime compatible)
+- **timecode.txt**: Detailed action timing log
+- **screenshots/**: Individual screenshots
+- **markers.vtt**: WebVTT subtitles for action descriptions
+- **chapters.txt**: FFMETADATA format chapter data
+
+Timecode logs contain:
+- Timestamp for each action (MM:SS.mmm format)
+- Action duration
+- Action type and description
+- Error messages if any
+
+Videos include:
+- Embedded chapter markers for easy navigation
+- Each action becomes a clickable chapter in QuickTime Player
+- WebVTT subtitles can be loaded in most video players

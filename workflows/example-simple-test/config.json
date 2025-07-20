@@ -1,0 +1,14 @@
+{
+  "browser": {
+    "headless": false,
+    "slowMo": 300,
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    },
+    "showBrowserUI": true
+  },
+  "video": {
+    "fps": 30
+  }
+}
