@@ -102,6 +102,7 @@ yarn setup
 | `check` | チェックボックスをチェック | `selector` |
 | `uncheck` | チェックボックスのチェックを外す | `selector` |
 | `evaluate` | JavaScriptを実行 | `script` |
+| `showMessage` | UIメッセージを表示 | `message` |
 
 ### アクションオプション
 
@@ -204,6 +205,29 @@ Total duration: 2s 567ms
 Completed at: 2025-01-18T14:30:02.567Z
 ```
 
+## UIフィードバック機能
+
+### showMessageアクション
+ワークフロー実行中にブラウザ内でメッセージを表示できます：
+
+```json
+{
+  "type": "showMessage",
+  "message": "処理を開始します",
+  "position": "top-center",
+  "style": "info",
+  "duration": 3000,
+  "description": "開始メッセージを表示"
+}
+```
+
+#### showMessageのオプション
+- `position`: メッセージの表示位置（top-left, top-center, top-right, bottom-left, bottom-center, bottom-right, center）
+- `style`: メッセージのスタイル（info, warning, error, success）
+- `duration`: 表示時間（ミリ秒）、0で手動クローズ
+- `closeButton`: 閉じるボタンの表示（デフォルト: true）
+- `waitForClose`: ユーザーが閉じるまで待機（デフォルト: false）
+
 ## 開発
 
 ```bash
@@ -234,7 +258,13 @@ Googleログイン、2FA、CAPTCHA など手動操作が必要な場面では `w
   "message": "Googleログインを完了してください",
   "continueSelector": "#account-menu",
   "timeout": 300000,
-  "description": "ユーザーのログイン完了を待機"
+  "description": "ユーザーのログイン完了を待機",
+  "showOverlay": true,
+  "overlayOptions": {
+    "title": "手動操作が必要です",
+    "instruction": "Googleアカウントでログインしてください",
+    "backdrop": true
+  }
 }
 ```
 

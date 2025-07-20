@@ -83,6 +83,23 @@ const WaitForManualActionSchema = BaseActionSchema.extend({
   continueSelector: z.string().optional(),
   continueText: z.string().optional(),
   timeout: z.number().positive().optional(),
+  showOverlay: z.boolean().optional(),
+  overlayOptions: z.object({
+    title: z.string().optional(),
+    instruction: z.string().optional(),
+    backdrop: z.boolean().optional(),
+    progress: z.boolean().optional(),
+  }).optional(),
+});
+
+const ShowMessageActionSchema = BaseActionSchema.extend({
+  type: z.literal('showMessage'),
+  message: z.string(),
+  position: z.enum(['top-left', 'top-center', 'top-right', 'bottom-left', 'bottom-center', 'bottom-right', 'center']).optional(),
+  duration: z.number().nonnegative().optional(),
+  style: z.enum(['info', 'warning', 'error', 'success']).optional(),
+  closeButton: z.boolean().optional(),
+  waitForClose: z.boolean().optional(),
 });
 
 export const ActionSchema = z.discriminatedUnion('type', [
@@ -100,6 +117,7 @@ export const ActionSchema = z.discriminatedUnion('type', [
   CheckActionSchema,
   UncheckActionSchema,
   EvaluateActionSchema,
+  ShowMessageActionSchema,
 ]);
 
 export const BrowserConfigSchema = z.object({

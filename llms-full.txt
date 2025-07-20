@@ -314,7 +314,14 @@ Pause automation for manual intervention (login, CAPTCHA, etc.).
   "continueSelector": "#user-menu",  // Option 1: Wait for element
   "continueText": "Welcome",          // Option 2: Wait for text
   "timeout": 300000,
-  "description": "Manual login required"
+  "description": "Manual login required",
+  "showOverlay": true,               // Show overlay UI with instructions
+  "overlayOptions": {
+    "title": "Manual Action Required",
+    "instruction": "Please complete the login process",
+    "backdrop": true,               // Darken background
+    "progress": false               // Show progress indicator
+  }
 }
 ```
 
@@ -345,6 +352,23 @@ Execute JavaScript in the page context.
   "type": "evaluate",
   "script": "document.querySelector('h1').textContent",
   "description": "Get page title"
+}
+```
+
+### UI Feedback Actions
+
+#### showMessage
+Display a message overlay in the browser for user feedback.
+```json
+{
+  "type": "showMessage",
+  "message": "Welcome to the demo!",
+  "position": "top-center",  // Options: top-left, top-center, top-right, bottom-left, bottom-center, bottom-right, center
+  "style": "info",          // Options: info, warning, error, success
+  "duration": 5000,         // Display duration in ms (0 = manual close)
+  "closeButton": true,      // Show close button
+  "waitForClose": false,    // Wait for user to close before continuing
+  "description": "Show welcome message"
 }
 ```
 
@@ -496,6 +520,50 @@ Sessions are stored in the `sessions/` directory and include:
 Sessions are browser-specific and include all persistent state needed to maintain login status.
 
 ## Advanced Features
+
+### Session Management
+
+Save and reuse browser sessions to avoid repeated logins:
+
+```bash
+# Save session after login
+yarn execute login-workflow --save-session production
+
+# Use saved session for recording
+yarn record main-workflow --session production
+```
+
+Sessions are stored in the `sessions/` directory and include cookies, localStorage, and authentication state.
+
+### UI Injection for User Feedback
+
+PlayFlow can display messages and overlays in the browser during workflow execution:
+
+1. **Message Notifications**: Show temporary messages to users
+2. **Manual Action Overlays**: Clear instructions during manual interventions
+3. **Progress Indicators**: Visual feedback for long-running operations
+
+Example workflow with UI feedback:
+```json
+[
+  {
+    "type": "showMessage",
+    "message": "Starting automated process...",
+    "position": "top-center",
+    "style": "info",
+    "duration": 3000
+  },
+  {
+    "type": "waitForManualAction",
+    "message": "Please complete the CAPTCHA",
+    "showOverlay": true,
+    "overlayOptions": {
+      "title": "Manual Intervention Required",
+      "backdrop": true
+    }
+  }
+]
+```
 
 ### Dynamic Values
 

@@ -13,6 +13,7 @@ import { SelectOptionHandler } from './actions/select-option';
 import { CheckHandler } from './actions/check';
 import { UncheckHandler } from './actions/uncheck';
 import { EvaluateHandler } from './actions/evaluate';
+import { ShowMessageHandler } from './actions/show-message';
 
 export function registerActionHandlers(executor: ActionExecutor): void {
   executor.registerHandler('goto', new GotoHandler());
@@ -29,4 +30,5 @@ export function registerActionHandlers(executor: ActionExecutor): void {
   executor.registerHandler('check', new CheckHandler());
   executor.registerHandler('uncheck', new UncheckHandler());
   executor.registerHandler('evaluate', new EvaluateHandler());
+  executor.registerHandler('showMessage', new ShowMessageHandler());
 }

@@ -50,6 +50,7 @@ Create a folder in `workflows/` with `actions.json`:
 - **Click/Input**: `click`, `fill`, `type`, `press`, `hover`
 - **Form**: `check`, `uncheck`, `selectOption`
 - **Wait**: `waitForSelector`, `waitForTimeout`, `waitForManualAction`
+- **UI Feedback**: `showMessage`
 - **Other**: `screenshot`, `evaluate`
 
 ## Action Properties
@@ -67,6 +68,13 @@ Create a folder in `workflows/` with `actions.json`:
 - `continueText`: Text to wait for completion
 - `skipVtt`: Skip WebVTT subtitle generation for this action (optional)
 - `skipChapter`: Skip chapter marker for this action (optional)
+- `showOverlay`: Show overlay UI for waitForManualAction (optional)
+- `overlayOptions`: Customize overlay appearance (optional)
+- `position`: Message position for showMessage (optional)
+- `duration`: Display duration in ms for showMessage (optional)
+- `style`: Message style (info/warning/error/success) for showMessage (optional)
+- `closeButton`: Show close button for showMessage (optional)
+- `waitForClose`: Wait for user to close message (optional)
 
 ## Configuration
 

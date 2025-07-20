@@ -1,25 +1,30 @@
 import { Page } from 'playwright';
 import { ActionHandler } from '../action-executor';
+import { WaitForManualActionAction } from '../../types';
 import chalk from 'chalk';
 import { readFileSync } from 'fs';
 import { join } from 'path';
+import { UIInjector } from '../ui-injector';
 
-interface WaitForManualActionOptions {
-  type: 'waitForManualAction';
-  description?: string;
-  message?: string;
-  continueSelector?: string;
-  continueText?: string;
-  timeout?: number;
-}
-
-export class WaitForManualActionHandler implements ActionHandler {
-  async execute(action: WaitForManualActionOptions, page: Page): Promise<void> {
+export class WaitForManualActionHandler implements ActionHandler<WaitForManualActionAction> {
+  async execute(action: WaitForManualActionAction, page: Page): Promise<void> {
     const message = action.message || action.description || 'Please complete the manual action';
     const timeout = action.timeout || 300000; // Default 5 minutes
     
     console.log(chalk.yellow('\n🔔 Manual Action Required:'));
     console.log(chalk.yellow(`   ${message}`));
+    
+    // Show overlay if requested
+    if (action.showOverlay) {
+      await UIInjector.showOverlay(page, {
+        title: action.overlayOptions?.title || 'Manual Action Required',
+        message: action.overlayOptions?.instruction || message,
+        backdrop: action.overlayOptions?.backdrop !== false,
+        progress: action.overlayOptions?.progress,
+        position: 'center',
+        style: 'info'
+      });
+    }
     
     if (action.continueSelector) {
       console.log(chalk.gray(`   Waiting for: ${action.continueSelector}`));
@@ -32,6 +37,11 @@ export class WaitForManualActionHandler implements ActionHandler {
       });
       
       console.log(chalk.green('✓ Manual action completed'));
+      
+      // Remove overlay if shown
+      if (action.showOverlay) {
+        await UIInjector.removeOverlay(page);
+      }
     } else if (action.continueText) {
       console.log(chalk.gray(`   Waiting for text: "${action.continueText}"`));
       console.log(chalk.gray(`   Timeout: ${timeout / 1000} seconds`));
@@ -47,6 +57,11 @@ export class WaitForManualActionHandler implements ActionHandler {
       );
       
       console.log(chalk.green('✓ Manual action completed'));
+      
+      // Remove overlay if shown
+      if (action.showOverlay) {
+        await UIInjector.removeOverlay(page);
+      }
     } else {
       // If no selector or text specified, show instructions and wait for Enter key
       console.log(chalk.cyan('\n   📌 Instructions:'));
@@ -66,6 +81,12 @@ export class WaitForManualActionHandler implements ActionHandler {
           const fs = await import('fs/promises');
           await fs.unlink(continueFilePath);
           console.log(chalk.green('\n✓ Manual action completed (.continue file detected)'));
+          
+          // Remove overlay if shown
+          if (action.showOverlay) {
+            await UIInjector.removeOverlay(page);
+          }
+          
           break;
         } catch {
           // File doesn't exist, wait and try again

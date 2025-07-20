@@ -12,7 +12,8 @@ export type ActionType =
   | 'selectOption' 
   | 'check' 
   | 'uncheck' 
-  | 'evaluate';
+  | 'evaluate'
+  | 'showMessage';
 
 export interface BaseAction {
   type: ActionType;
@@ -97,6 +98,23 @@ export interface WaitForManualActionAction extends BaseAction {
   continueSelector?: string;
   continueText?: string;
   timeout?: number;
+  showOverlay?: boolean;
+  overlayOptions?: {
+    title?: string;
+    instruction?: string;
+    backdrop?: boolean;
+    progress?: boolean;
+  };
+}
+
+export interface ShowMessageAction extends BaseAction {
+  type: 'showMessage';
+  message: string;
+  position?: 'top-left' | 'top-center' | 'top-right' | 'bottom-left' | 'bottom-center' | 'bottom-right' | 'center';
+  duration?: number;
+  style?: 'info' | 'warning' | 'error' | 'success';
+  closeButton?: boolean;
+  waitForClose?: boolean;
 }
 
 export type Action = 
@@ -113,4 +131,5 @@ export type Action =
   | SelectOptionAction 
   | CheckAction 
   | UncheckAction 
-  | EvaluateAction;
+  | EvaluateAction
+  | ShowMessageAction;

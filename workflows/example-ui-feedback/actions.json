@@ -1,0 +1,71 @@
+[
+  {
+    "type": "goto",
+    "url": "https://example.com",
+    "description": "Navigate to example.com"
+  },
+  {
+    "type": "showMessage",
+    "message": "Welcome to PlayFlow!\nThis is a demo of our UI injection feature.",
+    "position": "center",
+    "style": "info",
+    "duration": 5000,
+    "description": "Info message demo"
+  },
+  {
+    "type": "waitForTimeout",
+    "timeout": 1000
+  },
+  {
+    "type": "showMessage",
+    "message": "✅ Page loaded successfully!\nAll systems operational.",
+    "position": "top-right",
+    "style": "success",
+    "duration": 4000,
+    "description": "Success message demo"
+  },
+  {
+    "type": "waitForTimeout",
+    "timeout": 1000
+  },
+  {
+    "type": "showMessage",
+    "message": "⚠️ Warning!\nThis is a warning message from PlayFlow.",
+    "position": "top-center",
+    "style": "warning",
+    "duration": 4000,
+    "description": "Warning message demo"
+  },
+  {
+    "type": "waitForTimeout",
+    "timeout": 1000
+  },
+  {
+    "type": "showMessage",
+    "message": "❌ Error occurred!\nThis is what an error looks like.",
+    "position": "bottom-center",
+    "style": "error",
+    "duration": 4000,
+    "description": "Error message demo"
+  },
+  {
+    "type": "waitForTimeout",
+    "timeout": 1000
+  },
+  {
+    "type": "showMessage",
+    "message": "🎉 Demo completed!\n\nPlayFlow UI injection makes it clear when automation is providing feedback.\n\nClick the X to close this message.",
+    "position": "center",
+    "style": "success",
+    "duration": 0,
+    "closeButton": true,
+    "waitForClose": true,
+    "description": "Final message"
+  },
+  {
+    "type": "screenshot",
+    "filename": "ui-feedback-demo",
+    "fullPage": true,
+    "description": "Capture demo screenshot"
+  }
+]
