@@ -125,6 +125,7 @@ yarn setup
     "skipChapter": true
   }
 ]
+```
 
 ## 設定
 

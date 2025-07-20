@@ -125,6 +125,7 @@ All actions support these optional parameters:
     "skipChapter": true
   }
 ]
+```
 
 ## Configuration
 
